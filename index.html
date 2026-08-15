@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astghik Stepanyan — Editor · Director · Cinematographer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0a14;
+    --bg-2:#161325;
+    --cream:#f5f0e8;
+    --cream-dim:#9d95b0;
+    --red:#e63946;
+    --orange:#ff6b35;
+    --gold:#f4b942;
+    --purple:#8b5cf6;
+    --pink:#ec4899;
+    --blue:#3b82f6;
+    --teal:#14b8a6;
+    --green:#22c55e;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+  }
+
+  /* Grain overlay */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:9999;
+    opacity:.04;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Color glow backgrounds */
+  .glow{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:.25;
+    pointer-events:none;
+    z-index:0;
+  }
+  .glow-red{width:500px;height:500px;background:var(--red)}
+  .glow-purple{width:600px;height:600px;background:var(--purple)}
+  .glow-blue{width:500px;height:500px;background:var(--blue)}
+  .glow-orange{width:550px;height:550px;background:var(--orange)}
+
+  /* NAV */
+  nav{
+    position:fixed;
+    top:0;left:0;right:0;
+    padding:22px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    z-index:100;
+    background:rgba(12,10,20,.6);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(245,240,232,.08);
+  }
+  nav .logo{
+    font-family:'Instrument Serif',serif;
+    font-size:22px;
+    font-style:italic;
+    letter-spacing:.5px;
+    color:var(--cream);
+    text-decoration:none;
+  }
+  nav .logo span{color:var(--orange)}
+  nav .nav-links{
+    display:flex;
+    gap:35px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+  }
+  nav .nav-links a{
+    color:var(--cream-dim);
+    text-decoration:none;
+    position:relative;
+    padding:5px 0;
+    transition:color .3s;
+  }
+  nav .nav-links a:hover{color:var(--cream)}
+  nav .nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0;bottom:0;
+    width:0;height:1px;
+    background:var(--orange);
+    transition:width .3s ease;
+  }
+  nav .nav-links a:hover::after{width:100%}
+  nav .time{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--gold);
+    letter-spacing:1px;
+  }
+
+  /* HERO */
+  .hero{
+    min-height:100vh;
+    padding:140px 40px 60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:50px;
+    position:relative;z-index:2;
+  }
+  .hero-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--cream);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 18px;
+    border:1px solid rgba(245,240,232,.2);
+    border-radius:50px;
+    background:rgba(245,240,232,.03);
+  }
+  .hero-tag .dot{
+    width:8px;height:8px;
+    background:var(--green);
+    border-radius:50%;
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.5;transform:scale(1.3)}
+  }
+  .hero-meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--cream-dim);
+    letter-spacing:1px;
+    text-align:right;
+    line-height:1.8;
+  }
+
+  .hero-name{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(4rem, 15vw, 14rem);
+    font-weight:500;
+    line-height:.9;
+    letter-spacing:-.04em;
+    margin-bottom:50px;
+    position:relative;
+    z-index:2;
+  }
+  .hero-name .word{
+    display:block;
+    overflow:hidden;
+  }
+  .hero-name .word span{
+    display:inline-block;
+    transform:translateY(100%);
+    animation:slideUp 1s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .hero-name .word:nth-child(2) span{animation-delay:.15s}
+  .hero-name em{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    background:linear-gradient(90deg,var(--orange),var(--pink),var(--purple));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  @keyframes slideUp{to{transform:translateY(0)}}
+
+  .hero-subtitle{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:clamp(1.3rem,2.5vw,2rem);
+    color:var(--cream-dim);
+    max-width:700px;
+    line-height:1.35;
+    position:relative;z-index:2;
+    margin-bottom:60px;
+  }
+  .hero-subtitle .hl-gold{color:var(--gold)}
+  .hero-subtitle .hl-orange{color:var(--orange)}
+
+  .hero-bottom{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:30px;
+    align-items:flex-end;
+    position:relative;z-index:2;
+  }
+  .hero-info{
+    padding:25px;
+    border-radius:16px;
+    background:rgba(245,240,232,.03);
+    border:1px solid rgba(245,240,232,.08);
+    transition:all .4s ease;
+  }
+  .hero-info:hover{
+    background:rgba(245,240,232,.06);
+    transform:translateY(-5px);
+  }
+  .hero-info h4{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .hero-info:nth-child(1) h4{color:var(--orange)}
+  .hero-info:nth-child(2) h4{color:var(--purple)}
+  .hero-info:nth-child(3) h4{color:var(--gold)}
+  .hero-info p{font-size:15px;line-height:1.5;color:var(--cream)}
+
+  .scroll-indicator{
+    position:absolute;
+    bottom:25px;
+    left:40px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--cream-dim);
+    z-index:3;
+  }
+  .scroll-line{width:60px;height:1px;background:rgba(245,240,232,.2);position:relative;overflow:hidden}
+  .scroll-line::after{
+    content:"";position:absolute;inset:0;
+    background:var(--orange);
+    animation:scrollLine 2s infinite;
+  }
+  @keyframes scrollLine{
+    0%{transform:translateX(-100%)}
+    100%{transform:translateX(100%)}
+  }
+
+  /* MARQUEE */
+  .marquee{
+    padding:25px 0;
+    overflow:hidden;
+    border-top:1px solid rgba(245,240,232,.08);
+    border-bottom:1px solid rgba(245,240,232,.08);
+    background:linear-gradient(90deg,rgba(230,57,70,.08),rgba(139,92,246,.08),rgba(59,130,246,.08));
+  }
+  .marquee-track{
+    display:flex;
+    gap:60px;
+    animation:marquee 30s linear infinite;
+    white-space:nowrap;
+  }
+  .marquee-item{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:42px;
+    font-weight:300;
+    letter-spacing:-1px;
+    color:var(--cream);
+    display:flex;
+    align-items:center;
+    gap:60px;
+  }
+  .marquee-item em{font-family:'Instrument Serif',serif;font-style:italic}
+  .marquee-item:nth-child(1) em{color:var(--orange)}
+  .marquee-item:nth-child(2) em{color:var(--purple)}
+  .marquee-item:nth-child(3) em{color:var(--blue)}
+  .marquee-item:nth-child(4) em{color:var(--gold)}
+  .marquee-item:nth-child(5) em{color:var(--pink)}
+  .marquee-item:nth-child(6) em{color:var(--teal)}
+  .marquee-star{font-size:26px}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* SECTION HEAD */
+  section{padding:120px 40px;position:relative;overflow:hidden}
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:40px;
+    margin-bottom:70px;
+    position:relative;z-index:2;
+    flex-wrap:wrap;
+  }
+  .section-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--cream-dim);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+  }
+  .section-label::before{content:"";width:30px;height:1px;background:currentColor}
+  .label-orange{color:var(--orange)}
+  .label-purple{color:var(--purple)}
+  .label-blue{color:var(--blue)}
+  .label-gold{color:var(--gold)}
+  .label-pink{color:var(--pink)}
+  .label-teal{color:var(--teal)}
+  .section-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(2.5rem,6vw,4.5rem);
+    font-weight:400;
+    line-height:1.05;
+    letter-spacing:-.03em;
+    max-width:800px;
+  }
+  .section-title em{font-family:'Instrument Serif',serif;font-style:italic}
+  .section-head-desc{
+    font-size:16px;
+    color:var(--cream-dim);
+    max-width:340px;
+    line-height:1.6;
+  }
+
+  /* ABOUT */
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    gap:70px;
+    align-items:start;
+    position:relative;z-index:2;
+  }
+  .about-text{font-size:21px;line-height:1.55;font-weight:300}
+  .about-text p{margin-bottom:28px}
+  .about-text strong{color:var(--cream);font-weight:500}
+  .about-text .hl-orange{color:var(--orange)}
+  .about-text .hl-purple{color:var(--purple);font-family:'Instrument Serif',serif;font-style:italic}
+  .about-text .hl-gold{color:var(--gold)}
+
+  .about-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .stat{
+    padding:35px 28px;
+    border-radius:20px;
+    border:1px solid rgba(245,240,232,.1);
+    transition:all .4s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .stat::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity .4s;
+  }
+  .stat:hover{transform:translateY(-5px)}
+  .stat:hover::before{opacity:1}
+  .stat-1{background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(230,57,70,.06))}
+  .stat-1::before{background:linear-gradient(135deg,rgba(255,107,53,.2),rgba(230,57,70,.1))}
+  .stat-2{background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(236,72,153,.06))}
+  .stat-2::before{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(236,72,153,.1))}
+  .stat-3{background:linear-gradient(135deg,rgba(244,185,66,.12),rgba(255,107,53,.06))}
+  .stat-3::before{background:linear-gradient(135deg,rgba(244,185,66,.2),rgba(255,107,53,.1))}
+  .stat-4{background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(20,184,166,.06))}
+  .stat-4::before{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(20,184,166,.1))}
+  .stat-num{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:52px;
+    font-weight:400;
+    letter-spacing:-2px;
+    margin-bottom:8px;
+    line-height:1;
+  }
+  .stat-1 .stat-num{color:var(--orange)}
+  .stat-2 .stat-num{color:var(--purple)}
+  .stat-3 .stat-num{color:var(--gold)}
+  .stat-4 .stat-num{color:var(--blue)}
+  .stat-num em{font-family:'Instrument Serif',serif;font-style:italic}
+  .stat-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--cream-dim);
+  }
+
+  /* SKILLS */
+  .skills-list{border-top:1px solid rgba(245,240,232,.12);position:relative;z-index:2}
+  .skill-row{
+    display:grid;
+    grid-template-columns:80px 1fr 2fr auto;
+    gap:40px;
+    padding:32px 20px;
+    border-bottom:1px solid rgba(245,240,232,.12);
+    align-items:center;
+    transition:all .4s ease;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .skill-row:hover{background:rgba(245,240,232,.03);padding-left:35px}
+  .skill-row:hover .skill-title{color:var(--row-color)}
+  .skill-row .skill-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cream-dim)}
+  .skill-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:30px;
+    font-weight:400;
+    letter-spacing:-.02em;
+    transition:color .3s;
+  }
+  .skill-desc{font-size:15px;color:var(--cream-dim);line-height:1.5}
+  .skill-dot{
+    width:14px;height:14px;
+    border-radius:50%;
+    background:var(--row-color);
+    box-shadow:0 0 20px var(--row-color);
+  }
+  .skill-row[data-color="red"]{--row-color:var(--red)}
+  .skill-row[data-color="purple"]{--row-color:var(--purple)}
+  .skill-row[data-color="gold"]{--row-color:var(--gold)}
+  .skill-row[data-color="blue"]{--row-color:var(--blue)}
+  .skill-row[data-color="pink"]{--row-color:var(--pink)}
+  .skill-row[data-color="teal"]{--row-color:var(--teal)}
+
+  /* VIDEO SHOWCASE — встроенные видео */
+  .video-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    position:relative;z-index:2;
+  }
+  .video-card{
+    border-radius:20px;
+    overflow:hidden;
+    background:var(--bg-2);
+    border:1px solid rgba(245,240,232,.1);
+    transition:all .4s ease;
+  }
+  .video-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 30px 60px rgba(0,0,0,.4);
+  }
+  .video-card.featured{grid-column:span 2}
+  .video-wrap{
+    position:relative;
+    padding-bottom:56.25%;
+    height:0;
+    overflow:hidden;
+    background:#000;
+  }
+  .video-card.featured .video-wrap{padding-bottom:48%}
+  .video-wrap iframe{
+    position:absolute;
+    inset:0;
+    width:100%;height:100%;
+    border:0;
+  }
+  .video-meta{
+    padding:24px 28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .video-meta .v-info h3{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:22px;
+    font-weight:400;
+    letter-spacing:-.01em;
+    margin-bottom:6px;
+  }
+  .video-meta .v-role{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--cream-dim);
+  }
+  .video-badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    padding:7px 14px;
+    border-radius:50px;
+    border:1px solid;
+    white-space:nowrap;
+  }
+  .badge-red{color:var(--red);border-color:var(--red);background:rgba(230,57,70,.1)}
+  .badge-purple{color:var(--purple);border-color:var(--purple);background:rgba(139,92,246,.1)}
+  .badge-gold{color:var(--gold);border-color:var(--gold);background:rgba(244,185,66,.1)}
+  .badge-blue{color:var(--blue);border-color:var(--blue);background:rgba(59,130,246,.1)}
+  .badge-teal{color:var(--teal);border-color:var(--teal);background:rgba(20,184,166,.1)}
+  .badge-orange{color:var(--orange);border-color:var(--orange);background:rgba(255,107,53,.1)}
+  .badge-pink{color:var(--pink);border-color:var(--pink);background:rgba(236,72,153,.1)}
+
+  .video-note{
+    margin-top:40px;
+    padding:24px 30px;
+    border-radius:16px;
+    background:linear-gradient(90deg,rgba(244,185,66,.08),rgba(255,107,53,.05));
+    border:1px solid rgba(244,185,66,.2);
+    font-size:15px;
+    color:var(--cream-dim);
+    line-height:1.6;
+    position:relative;z-index:2;
+  }
+  .video-note strong{color:var(--gold);font-weight:500}
+
+  /* PROJECT CARDS — Яндекс.Диск и Instagram */
+  .project-grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:24px;
+    position:relative;z-index:2;
+  }
+  .project-card{
+    position:relative;
+    border-radius:20px;
+    overflow:hidden;
+    text-decoration:none;
+    color:var(--cream);
+    display:block;
+    transition:all .5s cubic-bezier(.2,.8,.2,1);
+    min-height:260px;
+  }
+  .project-card:hover{transform:translateY(-8px)}
+  .project-card:hover .p-arrow{transform:rotate(45deg) scale(1.1)}
+  .project-card:hover .p-bg{transform:scale(1.06)}
+  .p-bg{
+    position:absolute;
+    inset:0;
+    transition:transform .6s cubic-bezier(.2,.8,.2,1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .p-bg::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.75));
+  }
+  .p-letter{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:130px;
+    opacity:.35;
+    color:#fff;
+    line-height:1;
+  }
+  .p-content{
+    position:absolute;
+    left:26px;right:26px;bottom:26px;
+    z-index:2;
+  }
+  .p-cat{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    padding:6px 12px;
+    border-radius:50px;
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(255,255,255,.15);
+    margin-bottom:12px;
+  }
+  .p-content h3{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:24px;
+    font-weight:400;
+    letter-spacing:-.02em;
+    margin-bottom:6px;
+    line-height:1.15;
+  }
+  .p-role{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:14px;
+    color:rgba(255,255,255,.75);
+  }
+  .p-arrow{
+    position:absolute;
+    top:22px;right:22px;
+    width:46px;height:46px;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    z-index:2;
+    transition:transform .35s ease;
+  }
+  /* Sizes */
+  .pc-7{grid-column:span 7}
+  .pc-5{grid-column:span 5}
+  .pc-4{grid-column:span 4}
+  .pc-6{grid-column:span 6}
+  .pc-8{grid-column:span 8}
+  /* Color gradients */
+  .grad-red{background:linear-gradient(135deg,#7f1d1d,#e63946,#ff6b35)}
+  .grad-purple{background:linear-gradient(135deg,#312e81,#8b5cf6,#ec4899)}
+  .grad-blue{background:linear-gradient(135deg,#1e3a8a,#3b82f6,#14b8a6)}
+  .grad-gold{background:linear-gradient(135deg,#78350f,#f4b942,#ff6b35)}
+  .grad-teal{background:linear-gradient(135deg,#134e4a,#14b8a6,#3b82f6)}
+  .grad-pink{background:linear-gradient(135deg,#831843,#ec4899,#8b5cf6)}
+  .grad-green{background:linear-gradient(135deg,#14532d,#22c55e,#14b8a6)}
+  .grad-orange{background:linear-gradient(135deg,#7c2d12,#ff6b35,#f4b942)}
+
+  /* CLIENTS */
+  .clients-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    position:relative;z-index:2;
+  }
+  .client-tile{
+    padding:36px 26px;
+    border-radius:18px;
+    text-decoration:none;
+    color:var(--cream);
+    transition:all .4s ease;
+    position:relative;
+    overflow:hidden;
+    min-height:170px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    border:1px solid rgba(245,240,232,.1);
+    background:var(--bg-2);
+  }
+  .client-tile:hover{transform:translateY(-5px)}
+  .client-tile .c-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:1px;
+  }
+  .client-tile h4{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:22px;
+    font-weight:400;
+    letter-spacing:-.02em;
+    margin-bottom:8px;
+  }
+  .client-tile .c-type{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--cream-dim);
+  }
+  .ct-1:hover{background:linear-gradient(135deg,#7f1d1d,#e63946);border-color:transparent}
+  .ct-2:hover{background:linear-gradient(135deg,#312e81,#8b5cf6);border-color:transparent}
+  .ct-3:hover{background:linear-gradient(135deg,#1e3a8a,#3b82f6);border-color:transparent}
+  .ct-4:hover{background:linear-gradient(135deg,#78350f,#f4b942);border-color:transparent}
+  .ct-5:hover{background:linear-gradient(135deg,#831843,#ec4899);border-color:transparent}
+  .ct-6:hover{background:linear-gradient(135deg,#134e4a,#14b8a6);border-color:transparent}
+  .ct-7:hover{background:linear-gradient(135deg,#7c2d12,#ff6b35);border-color:transparent}
+  .ct-8:hover{background:linear-gradient(135deg,#14532d,#22c55e);border-color:transparent}
+
+  /* CONTACT */
+  .contact-section{padding:140px 40px 80px;border-top:1px solid rgba(245,240,232,.08)}
+  .contact-big{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(2.8rem,8vw,7.5rem);
+    font-weight:300;
+    line-height:1.02;
+    letter-spacing:-.04em;
+    margin-bottom:90px;
+    position:relative;z-index:2;
+  }
+  .contact-big em{font-family:'Instrument Serif',serif;font-style:italic}
+  .contact-big a{
+    color:var(--cream);
+    text-decoration:none;
+    border-bottom:3px solid var(--orange);
+    transition:all .3s;
+  }
+  .contact-big a.tg-link{border-color:var(--blue)}
+  .contact-big a:hover{color:var(--orange)}
+  .contact-big a.tg-link:hover{color:var(--blue)}
+
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:20px;
+    padding-top:50px;
+    border-top:1px solid rgba(245,240,232,.12);
+    position:relative;z-index:2;
+  }
+  .contact-block{
+    padding:30px;
+    border-radius:18px;
+    background:var(--bg-2);
+    border:1px solid rgba(245,240,232,.1);
+    transition:all .4s ease;
+  }
+  .contact-block:hover{transform:translateY(-4px)}
+  .contact-block h5{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .cb-email h5{color:var(--orange)}
+  .cb-email:hover{border-color:var(--orange)}
+  .cb-tg h5{color:var(--blue)}
+  .cb-tg:hover{border-color:var(--blue)}
+  .cb-ig h5{color:var(--pink)}
+  .cb-ig:hover{border-color:var(--pink)}
+  .contact-block a{
+    display:block;
+    color:var(--cream);
+    text-decoration:none;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:20px;
+    font-weight:400;
+    letter-spacing:-.01em;
+    line-height:1.4;
+    word-break:break-word;
+  }
+
+  /* FOOTER */
+  footer{
+    padding:35px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-top:1px solid rgba(245,240,232,.08);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    color:var(--cream-dim);
+    flex-wrap:wrap;
+    gap:15px;
+  }
+  footer .copyright{display:flex;align-items:center;gap:10px}
+  footer .dot-live{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+  footer .heart{color:var(--red)}
+
+  /* Reveal */
+  .reveal-up{opacity:0;transform:translateY(50px);transition:all 1s cubic-bezier(.2,.8,.2,1)}
+  .reveal-up.visible{opacity:1;transform:translateY(0)}
+
+  /* Responsive */
+  @media (max-width:900px){
+    nav{padding:18px 20px}
+    nav .nav-links{display:none}
+    .hero{padding:110px 20px 40px}
+    .hero-bottom{grid-template-columns:1fr;gap:15px}
+    section{padding:80px 20px}
+    .section-head{flex-direction:column;align-items:flex-start}
+    .about-grid{grid-template-columns:1fr;gap:40px}
+    .about-text{font-size:18px}
+    .skill-row{grid-template-columns:45px 1fr;gap:12px;padding:22px 12px}
+    .skill-desc,.skill-dot{display:none}
+    .skill-title{font-size:21px}
+    .video-grid{grid-template-columns:1fr}
+    .video-card.featured{grid-column:span 1}
+    .project-grid{grid-template-columns:1fr}
+    .pc-7,.pc-5,.pc-4,.pc-6,.pc-8{grid-column:span 1}
+    .clients-grid{grid-template-columns:1fr 1fr;gap:12px}
+    .contact-grid{grid-template-columns:1fr}
+    .marquee-item{font-size:26px;gap:30px}
+    .scroll-indicator{display:none}
+    footer{flex-direction:column;text-align:center}
+    .hero-top{flex-direction:column;gap:20px;align-items:flex-start}
+    .hero-meta{text-align:left}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Astghik S<span>.</span>™</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#films">Films</a>
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="time" id="time">—</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="glow glow-purple" style="top:-100px;right:-150px"></div>
+  <div class="glow glow-red" style="bottom:-150px;left:-100px"></div>
+
+  <div class="hero-top">
+    <div class="hero-tag"><span class="dot"></span> Available for Projects · 2026</div>
+    <div class="hero-meta">
+      Moscow, Russia<br>
+      MSNC · Directing Faculty<br>
+      Mac M2 · Adobe · DaVinci
+    </div>
+  </div>
+
+  <div>
+    <h1 class="hero-name">
+      <span class="word"><span>Astghik</span></span>
+      <span class="word"><span><em>Stepanyan</em> —</span></span>
+    </h1>
+    <p class="hero-subtitle">
+      Editor, director & cinematographer crafting <span class="hl-gold">cinematic stories</span> for film, YouTube and social — <span class="hl-orange">one frame at a time.</span>
+    </p>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="hero-info">
+      <h4>◈ Based In</h4>
+      <p>Moscow, Russia — currently studying <em>directing</em> at the Moscow School of New Cinema.</p>
+    </div>
+    <div class="hero-info">
+      <h4>◈ Working With</h4>
+      <p>YouTube creators, podcasts, commercial brands and independent film projects.</p>
+    </div>
+    <div class="hero-info">
+      <h4>◈ Five+ Years</h4>
+      <p>Editing, writing and shooting. Professional workflow in <em>Adobe</em> and <em>DaVinci Resolve</em>.</p>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span>Scroll to explore</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <div class="marquee-item">✦ Editor <em>&</em> Director</div>
+    <div class="marquee-item">✦ <em>Showreel</em></div>
+    <div class="marquee-item">✦ <em>Podcaster</em></div>
+    <div class="marquee-item">✦ Cinematographer</div>
+    <div class="marquee-item">✦ <em>Colorist</em></div>
+    <div class="marquee-item">✦ <em>Scriptwriter</em></div>
+    <div class="marquee-item">✦ Editor <em>&</em> Director</div>
+    <div class="marquee-item">✦ <em>Showreel</em></div>
+    <div class="marquee-item">✦ <em>Podcaster</em></div>
+    <div class="marquee-item">✦ Cinematographer</div>
+    <div class="marquee-item">✦ <em>Colorist</em></div>
+    <div class="marquee-item">✦ <em>Scriptwriter</em></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="reveal-up">
+  <div class="glow glow-orange" style="top:50%;left:-200px"></div>
+  <div class="section-head">
+    <div>
+      <div class="section-label label-orange">[ 01 ] About</div>
+      <h2 class="section-title">A filmmaker at the intersection of <em style="color:var(--orange)">cinema</em> and the <em style="color:var(--purple)">internet</em>.</h2>
+    </div>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm <strong>Astghik Stepanyan</strong> — a Moscow-based filmmaker with over <span class="hl-orange"><strong>five years</strong></span> of experience in editing, writing and shooting.</p>
+      <p>Currently studying <span class="hl-purple">directing</span> at the Moscow School of New Cinema. I approach every project — from a 90-second reel to a feature-length film — with the same cinematic discipline: every cut matters, every frame has intention.</p>
+      <p>I work in <strong>Adobe Premiere Pro</strong> and <strong>DaVinci Resolve</strong> on a <span class="hl-gold"><strong>Mac M2</strong></span>. Fast turnaround, clean cuts, considered color.</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat stat-1">
+        <div class="stat-num">5<em>+</em></div>
+        <div class="stat-label">Years Editing</div>
+      </div>
+      <div class="stat stat-2">
+        <div class="stat-num">8<em>+</em></div>
+        <div class="stat-label">Brands & Creators</div>
+      </div>
+      <div class="stat stat-3">
+        <div class="stat-num"><em>∞</em></div>
+        <div class="stat-label">Frames Cut</div>
+      </div>
+      <div class="stat stat-4">
+        <div class="stat-num">M2</div>
+        <div class="stat-label">Machine of Choice</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="reveal-up">
+  <div class="glow glow-blue" style="top:-100px;right:-200px"></div>
+  <div class="section-head">
+    <div>
+      <div class="section-label label-purple">[ 02 ] Craft</div>
+      <h2 class="section-title">The <em style="color:var(--purple)">skills</em> behind the frames.</h2>
+    </div>
+    <p class="section-head-desc">Six disciplines, one goal — stories that stay with you after the screen goes dark.</p>
+  </div>
+
+  <div class="skills-list">
+    <div class="skill-row" data-color="red">
+      <div class="skill-num">/ 01</div>
+      <div class="skill-title">Editing</div>
+      <div class="skill-desc">Professional cuts, rhythm and pacing. Feature films, podcasts, reels, YouTube shows — storytelling through the timeline.</div>
+      <div class="skill-dot"></div>
+    </div>
+    <div class="skill-row" data-color="purple">
+      <div class="skill-num">/ 02</div>
+      <div class="skill-title">Directing</div>
+      <div class="skill-desc">Currently studying directing at MSNC. Working on visual narrative, actor work, and cinematic language.</div>
+      <div class="skill-dot"></div>
+    </div>
+    <div class="skill-row" data-color="gold">
+      <div class="skill-num">/ 03</div>
+      <div class="skill-title">Scriptwriting</div>
+      <div class="skill-desc">Writing scripts, treatments and concepts. From commercial briefs to narrative shorts — story first, always.</div>
+      <div class="skill-dot"></div>
+    </div>
+    <div class="skill-row" data-color="blue">
+      <div class="skill-num">/ 04</div>
+      <div class="skill-title">Cinematography</div>
+      <div class="skill-desc">Shooting my own projects. Composition, light, movement — bringing the written word into visual form.</div>
+      <div class="skill-dot"></div>
+    </div>
+    <div class="skill-row" data-color="pink">
+      <div class="skill-num">/ 05</div>
+      <div class="skill-title">Color Grading</div>
+      <div class="skill-desc">DaVinci Resolve colorist. Grade matching mood — from cinematic teal-orange to raw documentary grit.</div>
+      <div class="skill-dot"></div>
+    </div>
+    <div class="skill-row" data-color="teal">
+      <div class="skill-num">/ 06</div>
+      <div class="skill-title">Adobe Suite</div>
+      <div class="skill-desc">Professional workflow in Premiere Pro, After Effects, Photoshop, Audition — full post-production capability.</div>
+      <div class="skill-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ФИЛЬМЫ — встроенные YouTube видео -->
+<section id="films" class="reveal-up">
+  <div class="glow glow-red" style="top:30%;right:-200px"></div>
+  <div class="section-head">
+    <div>
+      <div class="section-label label-red">[ 03 ] My Films</div>
+      <h2 class="section-title">Watch <em style="color:var(--red)">my films</em> right here.</h2>
+    </div>
+    <p class="section-head-desc">Written, directed and edited by me. Press play — no downloads needed.</p>
+  </div>
+
+  <div class="video-grid">
+    <div class="video-card featured">
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/appEjEkYQek" title="My Film I" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-meta">
+        <div class="v-info">
+          <h3>My Film I</h3>
+          <div class="v-role">Writer · Director · Editor</div>
+        </div>
+        <span class="video-badge badge-red">● Feature</span>
+      </div>
+    </div>
+
+    <div class="video-card">
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/GMxHPE6F34Q" title="My Film II" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-meta">
+        <div class="v-info">
+          <h3>My Film II</h3>
+          <div class="v-role">Writer · Director · Editor</div>
+        </div>
+        <span class="video-badge badge-purple">● Film</span>
+      </div>
+    </div>
+
+    <div class="video-card">
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/UJH8OORrs3M" title="Etude" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-meta">
+        <div class="v-info">
+          <h3>Etude</h3>
+          <div class="v-role">Editor + Cinematographer</div>
+        </div>
+        <span class="video-badge badge-gold">● Study</span>
+      </div>
+    </div>
+
+    <div class="video-card featured">
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/WmTqMNs5h3w" title="Lev Haolman" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-meta">
+        <div class="v-info">
+          <h3>Lev Haolman — Latest Episodes</h3>
+          <div class="v-role">Editor on the channel</div>
+        </div>
+        <span class="video-badge badge-blue">● YouTube</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="video-note">
+    <strong>⚡ Note:</strong> Videos hosted on YouTube play directly on this page. The rest of my work — showreel, podcasts, lectures, interviews — lives on Yandex Disk & Instagram, linked in the next section.
+  </div>
+</section>
+
+<!-- РАБОТЫ — Яндекс.Диск и Instagram карточки -->
+<section id="work" class="reveal-up">
+  <div class="glow glow-purple" style="bottom:-100px;left:-150px"></div>
+  <div class="section-head">
+    <div>
+      <div class="section-label label-gold">[ 04 ] Selected Work</div>
+      <h2 class="section-title">More <em style="color:var(--gold)">projects</em> & collaborations.</h2>
+    </div>
+    <p class="section-head-desc">Showreel, podcasts, reels and commercial work — click any card to watch.</p>
+  </div>
+
+  <div class="project-grid">
+    <a class="project-card pc-7 hoverable" href="https://disk.yandex.ru/i/ruKOVlnjhBd4Dw" target="_blank">
+      <div class="p-bg grad-red"><div class="p-letter">S</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Showreel</span>
+        <h3>Film Showreel</h3>
+        <div class="p-role">Selected cinematic work</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-5 hoverable" href="https://disk.yandex.ru/d/WNoiC-mBhx_BAw" target="_blank">
+      <div class="p-bg grad-purple"><div class="p-letter">P</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Podcasts</span>
+        <h3>Podcast Reel</h3>
+        <div class="p-role">Multiple podcast edits</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-4 hoverable" href="https://disk.yandex.ru/i/cuemJHMb-dPcTw" target="_blank">
+      <div class="p-bg grad-blue"><div class="p-letter">L</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Lecture</span>
+        <h3>Lecture</h3>
+        <div class="p-role">Educational content</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-4 hoverable" href="https://disk.yandex.ru/d/-Ozm0IVYoHHRFA" target="_blank">
+      <div class="p-bg grad-teal"><div class="p-letter">I</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Interview</span>
+        <h3>Interview</h3>
+        <div class="p-role">Long-form conversation</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-4 hoverable" href="https://disk.yandex.ru/d/AKfBIaevL-Rnqw" target="_blank">
+      <div class="p-bg grad-pink"><div class="p-letter">R</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Reels</span>
+        <h3>Reels Reel</h3>
+        <div class="p-role">Short-form vertical edits</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-5 hoverable" href="https://disk.yandex.ru/d/5-zU25zOYnJG5A" target="_blank">
+      <div class="p-bg grad-orange"><div class="p-letter">E</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Etudes</span>
+        <h3>Etudes Collection</h3>
+        <div class="p-role">Editor + Cinematographer</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-7 hoverable" href="https://www.instagram.com/cherez.ne.mogy" target="_blank">
+      <div class="p-bg grad-green"><div class="p-letter">C</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Sport Brand</span>
+        <h3>Cherez Ne Mogy</h3>
+        <div class="p-role">Instagram content</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-4 hoverable" href="https://www.instagram.com/sektabeauty" target="_blank">
+      <div class="p-bg grad-pink"><div class="p-letter">S</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Beauty</span>
+        <h3>Secta Beauty</h3>
+        <div class="p-role">For hairdressers</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-4 hoverable" href="https://www.instagram.com/tesaran.residence" target="_blank">
+      <div class="p-bg grad-gold"><div class="p-letter">T</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● Real Estate</span>
+        <h3>Tesaran Residence</h3>
+        <div class="p-role">Instagram content</div>
+      </div>
+    </a>
+
+    <a class="project-card pc-4 hoverable" href="https://youtube.com/@business_hard" target="_blank">
+      <div class="p-bg grad-blue"><div class="p-letter">B</div></div>
+      <div class="p-arrow">↗</div>
+      <div class="p-content">
+        <span class="p-cat">● YouTube Show</span>
+        <h3>Business Hard</h3>
+        <div class="p-role">Conversational video</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section class="reveal-up">
+  <div class="section-head">
+    <div>
+      <div class="section-label label-teal">[ 05 ] Cast & Crew</div>
+      <h2 class="section-title">Clients & <em style="color:var(--teal)">collaborators</em>.</h2>
+    </div>
+  </div>
+
+  <div class="clients-grid">
+    <a class="client-tile ct-1" href="https://youtube.com/@kolotov_auto" target="_blank">
+      <div class="c-num" style="color:var(--red)">/ 01</div>
+      <div>
+        <h4>Dmitry Kolotov</h4>
+        <div class="c-type">YouTube Channel</div>
+      </div>
+    </a>
+    <a class="client-tile ct-2" href="#" target="_blank">
+      <div class="c-num" style="color:var(--purple)">/ 02</div>
+      <div>
+        <h4>Dan Maralex</h4>
+        <div class="c-type">Podcast</div>
+      </div>
+    </a>
+    <a class="client-tile ct-3" href="https://www.instagram.com/tesaran.residence" target="_blank">
+      <div class="c-num" style="color:var(--blue)">/ 03</div>
+      <div>
+        <h4>Tesaran Residence</h4>
+        <div class="c-type">Real Estate · Instagram</div>
+      </div>
+    </a>
+    <a class="client-tile ct-4" href="https://www.instagram.com/sektabeauty" target="_blank">
+      <div class="c-num" style="color:var(--gold)">/ 04</div>
+      <div>
+        <h4>Secta Beauty</h4>
+        <div class="c-type">Hairdressing Company</div>
+      </div>
+    </a>
+    <a class="client-tile ct-5" href="https://www.instagram.com/cherez.ne.mogy" target="_blank">
+      <div class="c-num" style="color:var(--pink)">/ 05</div>
+      <div>
+        <h4>Cherez Ne Mogy</h4>
+        <div class="c-type">Sport Brand</div>
+      </div>
+    </a>
+    <a class="client-tile ct-6" href="https://youtu.be/WmTqMNs5h3w" target="_blank">
+      <div class="c-num" style="color:var(--teal)">/ 06</div>
+      <div>
+        <h4>Lev Haolman</h4>
+        <div class="c-type">YouTube · Editor</div>
+      </div>
+    </a>
+    <a class="client-tile ct-7" href="https://youtube.com/@business_hard" target="_blank">
+      <div class="c-num" style="color:var(--orange)">/ 07</div>
+      <div>
+        <h4>Business Hard</h4>
+        <div class="c-type">YouTube Show</div>
+      </div>
+    </a>
+    <a class="client-tile ct-8" href="https://www.instagram.com/sektabeauty" target="_blank">
+      <div class="c-num" style="color:var(--green)">/ 08</div>
+      <div>
+        <h4>Sekta Instagram</h4>
+        <div class="c-type">Social Content</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section reveal-up">
+  <div class="glow glow-gold" style="top:0;left:50%;transform:translateX(-50%)"></div>
+  <div class="section-head">
+    <div>
+      <div class="section-label label-pink">[ 06 ] Contact</div>
+      <h2 class="section-title">Let's <em style="color:var(--pink)">make something</em> together.</h2>
+    </div>
+  </div>
+
+  <h3 class="contact-big">
+    Got a project in mind? <br>
+    <a href="mailto:astghik.stepanian@mail.ru">Say hello</a> <em style="color:var(--gold)">—</em> <br>
+    or just send a message on <a href="https://t.me/astghikstepanian" target="_blank" class="tg-link">Telegram</a>.
+  </h3>
+
+  <div class="contact-grid">
+    <div class="contact-block cb-email">
+      <h5>✉ Email</h5>
+      <a href="mailto:astghik.stepanian@mail.ru">astghik.stepanian@mail.ru</a>
+    </div>
+    <div class="contact-block cb-tg">
+      <h5>◈ Telegram</h5>
+      <a href="https://t.me/astghikstepanian" target="_blank">@astghikstepanian</a>
+    </div>
+    <div class="contact-block cb-ig">
+      <h5>◉ Instagram</h5>
+      <a href="https://instagram.com/astghik_stepanian" target="_blank">@astghik_stepanian</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="copyright">
+    <span class="dot-live"></span>
+    © 2026 · Astghik Stepanyan · All rights reserved
+  </div>
+  <div>Moscow, Russia · MSNC · Directing</div>
+  <div>Made with <span class="heart">♥</span> & film grain</div>
+</footer>
+
+<script>
+  // Time
+  function updateTime(){
+    const now = new Date();
+    const opts = {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:'Europe/Moscow'};
+    document.getElementById('time').textContent = 'MSK · ' + now.toLocaleTimeString('en-GB',opts);
+  }
+  updateTime();
+  setInterval(updateTime,1000);
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  },{threshold:0.08});
+  document.querySelectorAll('.reveal-up').forEach(el=>observer.observe(el));
+
+  // Parallax glows
+  document.addEventListener('mousemove',(e)=>{
+    const x = (e.clientX/window.innerWidth - .5);
+    const y = (e.clientY/window.innerHeight - .5);
+    const name = document.querySelector('.hero-name');
+    if(name && window.innerWidth > 900){
+      name.style.transform = `translate(${x*20}px,${y*15}px)`;
+    }
+  });
+</script>
+
+</body>
+</html>
