@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <meta name="description" content="Astghik Stepanyan — Editor, Director & Cinematographer. Moscow School of New Cinema.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Astghik Stepanyan — Editor · Director · Cinematographer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +35,8 @@
     font-weight:300;
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
   }
 
   /* Grain overlay */
@@ -126,6 +130,7 @@
     cursor:pointer;
     padding:10px;
     z-index:102;
+    -webkit-tap-highlight-color:transparent;
   }
   .burger span{
     width:28px;
@@ -142,6 +147,7 @@
     inset:0;
     background:rgba(12,10,20,.98);
     backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
     z-index:101;
     display:flex;
     flex-direction:column;
@@ -151,6 +157,7 @@
     opacity:0;
     visibility:hidden;
     transition:all .4s ease;
+    touch-action:none;
   }
   .mobile-menu.open{opacity:1;visibility:visible}
   .mobile-menu a{
@@ -161,8 +168,10 @@
     text-decoration:none;
     letter-spacing:-.02em;
     transition:color .3s;
+    padding:10px 20px;
   }
-  .mobile-menu a:hover{color:var(--orange)}
+  .mobile-menu a:hover,
+  .mobile-menu a:active{color:var(--orange)}
   .mobile-menu .mm-time{
     font-family:'JetBrains Mono',monospace;
     font-size:12px;
@@ -233,6 +242,7 @@
     position:relative;
     z-index:2;
     word-break:break-word;
+    will-change:transform;
   }
   .hero-name .word{
     display:block;
@@ -482,6 +492,7 @@
     transition:all .4s ease;
     border-radius:12px;
     cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
   }
   .skill-row:hover{background:rgba(245,240,232,.03);padding-left:35px}
   .skill-row:hover .skill-title{color:var(--row-color)}
@@ -608,6 +619,7 @@
     display:block;
     transition:all .5s cubic-bezier(.2,.8,.2,1);
     min-height:260px;
+    -webkit-tap-highlight-color:transparent;
   }
   .project-card:hover{transform:translateY(-8px)}
   .project-card:hover .p-arrow{transform:rotate(45deg) scale(1.1)}
@@ -719,6 +731,7 @@
     justify-content:space-between;
     border:1px solid rgba(245,240,232,.1);
     background:var(--bg-2);
+    -webkit-tap-highlight-color:transparent;
   }
   .client-tile:hover{transform:translateY(-5px)}
   .client-tile:active{transform:scale(.98)}
@@ -767,6 +780,7 @@
     text-decoration:none;
     border-bottom:3px solid var(--orange);
     transition:all .3s;
+    -webkit-tap-highlight-color:transparent;
   }
   .contact-big a.tg-link{border-color:var(--blue)}
   .contact-big a:hover{color:var(--orange)}
@@ -786,6 +800,7 @@
     background:var(--bg-2);
     border:1px solid rgba(245,240,232,.1);
     transition:all .4s ease;
+    -webkit-tap-highlight-color:transparent;
   }
   .contact-block:hover{transform:translateY(-4px)}
   .contact-block:active{transform:scale(.98)}
@@ -847,7 +862,7 @@
     .hero-top{flex-direction:column;gap:20px;align-items:flex-start;margin-bottom:40px}
     .hero-meta{text-align:left}
     .hero-tag{font-size:11px;padding:7px 14px}
-    .hero-name{margin-bottom:35px}
+    .hero-name{margin-bottom:35px;transform:none !important}
     .hero-subtitle{margin-bottom:40px}
     .hero-bottom{grid-template-columns:1fr;gap:15px}
     .hero-info{padding:20px}
@@ -892,6 +907,13 @@
     .marquee-item{gap:35px}
     .marquee-track{gap:35px}
     .glow{opacity:.15}
+    
+    /* Disable hover effects on touch devices */
+    .project-card:hover,
+    .client-tile:hover,
+    .contact-block:hover,
+    .stat:hover,
+    .hero-info:hover{transform:none}
   }
 
   /* Extra small phones */
@@ -1393,10 +1415,20 @@
   const burger = document.getElementById('burger');
   const mobileMenu = document.getElementById('mobileMenu');
   
-  burger.addEventListener('click', () => {
+  burger.addEventListener('click', (e) => {
+    e.stopPropagation();
     burger.classList.toggle('open');
     mobileMenu.classList.toggle('open');
     document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  });
+
+  // Close menu on backdrop click
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target === mobileMenu) {
+      burger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
   });
 
   // Close menu on link click
@@ -1406,6 +1438,15 @@
       mobileMenu.classList.remove('open');
       document.body.style.overflow = '';
     });
+  });
+
+  // Close menu on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+      burger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
   });
 
   // Time
@@ -1431,17 +1472,28 @@
   },{threshold:0.08,rootMargin:'0px 0px -50px 0px'});
   document.querySelectorAll('.reveal-up').forEach(el=>observer.observe(el));
 
-  // Parallax only on desktop
-  if(window.matchMedia('(min-width: 900px)').matches){
-    document.addEventListener('mousemove',(e)=>{
-      const x = (e.clientX/window.innerWidth - .5);
-      const y = (e.clientY/window.innerHeight - .5);
-      const name = document.querySelector('.hero-name');
-      if(name){
-        name.style.transform = `translate(${x*20}px,${y*15}px)`;
-      }
-    });
+  // Parallax only on desktop with mouse
+  const isDesktop = window.matchMedia('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches;
+  if(isDesktop){
+    const heroName = document.querySelector('.hero-name');
+    if(heroName){
+      document.addEventListener('mousemove',(e)=>{
+        const x = (e.clientX/window.innerWidth - .5);
+        const y = (e.clientY/window.innerHeight - .5);
+        heroName.style.transform = `translate(${x*20}px,${y*15}px)`;
+      });
+    }
   }
+
+  // Prevent iOS double-tap zoom on interactive elements
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
 </script>
 
 </body>
